@@ -1,0 +1,21 @@
+name: Use Greet Composite Action
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  consume:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: greet
+        uses: ./.github/actions/greet
+        with:
+          who: GH-200
+          times: '5'
+
+      - name: Consumir output
+        run: echo "Output da composite = ${{ steps.greet.outputs.greeting }}"

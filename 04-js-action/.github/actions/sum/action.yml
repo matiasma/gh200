@@ -1,0 +1,19 @@
+name: 'Sum'
+description: 'Soma dois números e retorna em output'
+author: 'gh-200-lab'
+
+inputs:
+  a:
+    description: 'Primeiro número (string em runtime)'
+    required: true
+  b:
+    description: 'Segundo número'
+    required: true
+
+outputs:
+  result:
+    description: 'a + b'
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'

@@ -1,0 +1,20 @@
+name: Caller
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  call-build:
+    uses: ./.github/workflows/reusable-build.yml
+    with:
+      environment: dev
+      node-version: '20'
+    secrets: inherit   # passa todos os secrets do caller (cuidado em produção)
+
+  consume:
+    needs: call-build
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Build ID retornado = ${{ needs.call-build.outputs.build-id }}"

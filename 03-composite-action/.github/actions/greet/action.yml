@@ -1,0 +1,38 @@
+name: 'Greet'
+description: 'Imprime saudação N vezes e devolve a última como output'
+
+inputs:
+  who:
+    description: 'A quem cumprimentar'
+    required: true
+    default: 'world'
+  times:
+    description: 'Quantas vezes (string em runtime!)'
+    required: false
+    default: '3'
+
+outputs:
+  greeting:
+    description: 'Última saudação gerada'
+    value: ${{ steps.gen.outputs.last }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Validar input
+      shell: bash
+      run: |
+        if [ -z "${{ inputs.who }}" ]; then
+          echo "::error::input 'who' vazio"; exit 1
+        fi
+
+    - name: Gerar saudações
+      id: gen
+      shell: bash
+      run: |
+        last=""
+        for i in $(seq 1 ${{ inputs.times }}); do
+          last="Hello ${{ inputs.who }} (#$i)"
+          echo "$last"
+        done
+        echo "last=$last" >> "$GITHUB_OUTPUT"

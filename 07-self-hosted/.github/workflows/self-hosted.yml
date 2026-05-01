@@ -1,0 +1,18 @@
+name: Self-hosted Demo
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  on-self-hosted:
+    runs-on: [self-hosted, linux, x64, gh-200-lab]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Info do runner
+        run: |
+          echo "Runner: $RUNNER_NAME"
+          echo "OS: $RUNNER_OS / $RUNNER_ARCH"
+          uname -a
+          whoami

@@ -1,0 +1,20 @@
+name: Use Sum JS Action
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test-sum:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: s
+        uses: ./.github/actions/sum
+        with:
+          a: '7'
+          b: '5'
+
+      - run: echo "Resultado = ${{ steps.s.outputs.result }}"

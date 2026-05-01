@@ -1,0 +1,33 @@
+name: Manual Dispatch
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Ambiente alvo'
+        required: true
+        type: choice
+        options: [dev, staging, prod]
+        default: dev
+      version:
+        description: 'Versão para deploy (semver)'
+        required: true
+        type: string
+      dry_run:
+        description: 'Apenas simular?'
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  show-inputs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mostrar inputs
+        run: |
+          echo "Env: ${{ inputs.environment }}"
+          echo "Version: ${{ inputs.version }}"
+          echo "Dry-run: ${{ inputs.dry_run }}"
+      - name: Executar deploy se não dry-run
+        if: inputs.dry_run == false
+        run: echo "Deploying ${{ inputs.version }} to ${{ inputs.environment }}..."

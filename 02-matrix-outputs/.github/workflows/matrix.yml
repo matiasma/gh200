@@ -1,0 +1,44 @@
+name: Matrix + Outputs
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node: [18, 20]
+        exclude:
+          - os: windows-latest
+            node: 18
+        include:
+          - os: ubuntu-latest
+            node: 20
+            experimental: true
+    runs-on: ${{ matrix.os }}
+    outputs:
+      version: ${{ steps.set.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Build
+        run: |
+          echo "Building em ${{ matrix.os }} com Node ${{ matrix.node }}"
+          echo "Experimental: ${{ matrix.experimental || 'false' }}"
+      - id: set
+        if: matrix.os == 'ubuntu-latest' && matrix.node == 20
+        shell: bash
+        run: echo "version=1.2.3" >> "$GITHUB_OUTPUT"
+
+  report:
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Versão capturada do build = ${{ needs.build.outputs.version }}"

@@ -1,0 +1,74 @@
+name: Cache + Artifacts
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache npm
+        id: npm-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            npm-${{ runner.os }}-
+
+      - name: Criar package.json mínimo (lab)
+        shell: bash
+        run: |
+          [ -f package.json ] || npm init -y
+          npm install lodash --save
+
+      - name: Gerar artifact único por matrix
+        shell: bash
+        run: |
+          mkdir -p out
+          echo "Build em ${{ matrix.os }} @ $(date)" > out/result-${{ matrix.os }}.txt
+
+      - name: Upload artifact (nome único por OS — v4 exige)
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ matrix.os }}
+          path: out/
+          retention-days: 7
+
+  consume:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download de TODOS os artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - run: |
+          ls -R artifacts
+          cat artifacts/build-ubuntu-latest/result-ubuntu-latest.txt
+
+  restore-only:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore-only cache (falha se não houver hit)
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.npm
+          key: npm-Linux-${{ hashFiles('**/package-lock.json') }}
+          fail-on-cache-miss: true

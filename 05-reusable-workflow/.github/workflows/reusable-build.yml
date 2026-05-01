@@ -1,0 +1,41 @@
+name: Reusable Build
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      node-version:
+        required: false
+        type: string
+        default: '20'
+    secrets:
+      MY_TOKEN:
+        required: true
+    outputs:
+      build-id:
+        description: 'ID do build'
+        value: ${{ jobs.build.outputs.id }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      id: ${{ steps.gen.outputs.id }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+
+      - name: Usar secret (mascarado)
+        run: echo "Token len=${#TOK}"
+        env:
+          TOK: ${{ secrets.MY_TOKEN }}
+
+      - id: gen
+        run: |
+          ID="build-${{ inputs.environment }}-$(date +%s)"
+          echo "id=$ID" >> "$GITHUB_OUTPUT"
+          echo "Generated: $ID"

@@ -1,0 +1,30 @@
+name: OIDC → Azure
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  id-token: write   # OBRIGATÓRIO para OIDC
+  contents: read
+
+jobs:
+  azure-login:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure login (sem secrets)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Listar resource groups
+        uses: azure/cli@v2
+        with:
+          inlineScript: |
+            az account show -o table
+            az group list -o table

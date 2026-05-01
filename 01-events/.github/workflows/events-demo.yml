@@ -1,0 +1,24 @@
+name: Events Demo (push + PR)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - '.github/workflows/**'
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  on-push:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Push em ${{ github.ref }} por ${{ github.actor }}"
+
+  pr-only:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "PR #${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}"

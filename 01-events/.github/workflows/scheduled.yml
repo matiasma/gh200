@@ -1,0 +1,12 @@
+name: Scheduled
+
+on:
+  schedule:
+    # Toda hora cheia, UTC. Use https://crontab.guru para validar.
+    - cron: '0 * * * *'
+
+jobs:
+  heartbeat:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Heartbeat $(date -u)"

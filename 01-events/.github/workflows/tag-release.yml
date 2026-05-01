@@ -1,0 +1,12 @@
+name: Tag Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Tag ${{ github.ref_name }} criada — disparando release pipeline"
